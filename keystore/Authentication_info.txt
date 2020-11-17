@@ -1,0 +1,3 @@
+KeyStore Password : p3n4w4rc4r3
+Key Alias : key0
+Alias Password : p3n4w4rc4r3
