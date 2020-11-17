@@ -1,0 +1,56 @@
+{
+  "project_info": {
+    "project_number": "392684150395",
+    "firebase_url": "https://penawarcareagent.firebaseio.com",
+    "project_id": "penawarcareagent",
+    "storage_bucket": "penawarcareagent.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:392684150395:android:ff5a939ff2233ebe4e4cde",
+        "android_client_info": {
+          "package_name": "com.zedtechs.penawarcare_agent"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "392684150395-c6pf3tudmit9s84ecm6sq3bjadiu2efp.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.zedtechs.penawarcare_agent",
+            "certificate_hash": "ebe7196f0b1a4ade61e198980ab13069b6a9791b"
+          }
+        },
+        {
+          "client_id": "392684150395-5k7kqi2jp9htvrulhbkti4db2pnlt2na.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.zedtechs.penawarcare_agent",
+            "certificate_hash": "c06f8d3d2bfe8bcbbe78d952169cb30208ccd4f5"
+          }
+        },
+        {
+          "client_id": "392684150395-tk081mcq69hajmik3ch359p8rqbv55d3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDbIaGnf8Y6EqUxiDdYNPEoRfK52FxZUPQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "392684150395-tk081mcq69hajmik3ch359p8rqbv55d3.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

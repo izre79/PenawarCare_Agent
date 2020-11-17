@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#000FE5</color>
+    <color name="colorPrimaryDark">#000244</color>
+    <color name="colorAccent">#D81B60</color>
+    <color name="white">#FFFFFF</color>
+
+    <!-- Chat Activity -->
+
+    <color name="localBackground">#827b92</color>
+    <color name="remoteBackground">#484258</color>
+    <color name="cardViewTitle">#472F92</color>
+    <color name="cardViewTitleText">#FFFFFF</color>
+    <color name="cardViewSubTitle">#1F716AFF</color>
+    <color name="cardViewSubTitleText">#C4301673</color>
+    <color name="cardViewSideTitle">#C4F7EDFF</color>
+    <color name="cardViewSideTitleText">#8D8D8D</color>
+    <color name="mainMenuItemTitle">#000000</color>
+    <color name="black_overlay">#66000000</color>
+    <color name="button_color">#66000000</color>
+
+</resources>

@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">PenawarCare - Agent</string>
+    <string name="notify_channel_name">PenawarCare Agent</string>
+    <string name="notify_channel_desc">PenawarCare Agent Notification</string>
+    <string name="title_activity_job_nav">Map</string>
+    <string name="google_maps_key">AIzaSyD6uEKKnQBEN4aXLrS1DqikXbBMXhgIwHc</string>
+</resources>

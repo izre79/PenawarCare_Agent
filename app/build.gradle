@@ -1,0 +1,74 @@
+apply plugin: 'com.android.application'
+
+android {
+    signingConfigs {
+        release {
+            storeFile file('K:\\Business\\ZED_Apps\\Projects\\PenawarCare_Agent\\keystore\\penawarcare-agent-key-release.jks')
+            storePassword 'p3n4w4rc4r3'
+            keyPassword 'p3n4w4rc4r3'
+            keyAlias 'key0'
+        }
+    }
+    compileSdkVersion 29
+
+    defaultConfig {
+        applicationId "com.zedtechs.penawarcare_agent"
+        minSdkVersion 16
+        targetSdkVersion 29
+        versionCode 11
+        versionName "1.1.4"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        vectorDrawables.useSupportLibrary = true
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+
+            // Enables resource shrinking, which is performed by the
+            // Android Gradle plugin.
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
+        debug {
+            jniDebuggable true
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    buildToolsVersion '29.0.2'
+}
+
+dependencies {
+
+    implementation fileTree(dir: "libs", include: ["*.jar"])
+    implementation 'androidx.core:core:1.5.0-alpha05'
+    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+    implementation 'androidx.recyclerview:recyclerview:1.1.0'
+    implementation platform('com.google.firebase:firebase-bom:26.0.0')
+    implementation 'androidx.browser:browser:1.2.0'
+
+    implementation 'com.google.firebase:firebase-auth:20.0.0'
+    implementation 'com.google.android.material:material:1.2.1'
+    implementation 'com.android.volley:volley:1.1.1'
+    implementation 'com.google.code.gson:gson:2.8.6'
+    implementation 'androidx.preference:preference:1.1.1'
+    implementation 'com.google.android.gms:play-services-maps:17.0.0'
+    implementation 'com.google.android.gms:play-services-location:17.1.0'
+
+    testImplementation 'junit:junit:4.13.1'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+
+    // Marker maps util dependency
+    implementation 'com.google.maps.android:android-maps-utils:2.1.0'
+
+}
+
+apply plugin: 'com.google.gms.google-services'  // Google Play services Gradle plugin
