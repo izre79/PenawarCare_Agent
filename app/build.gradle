@@ -3,7 +3,7 @@ apply plugin: 'com.android.application'
 android {
     signingConfigs {
         release {
-            storeFile file('K:\\Business\\ZED_Apps\\Projects\\PenawarCare_Agent\\keystore\\penawarcare-agent-key-release.jks')
+            storeFile file('..\\keystore\\penawarcare-agent-key-release.jks')
             storePassword 'p3n4w4rc4r3'
             keyPassword 'p3n4w4rc4r3'
             keyAlias 'key0'
