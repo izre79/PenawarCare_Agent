@@ -25,6 +25,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.ScrollView;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -77,9 +79,12 @@ public class HomePageActivity extends AppCompatActivity {
     String agentid, mobileno, securetokenid, lastscrupdate = "";
     SharedPreferences sharedpreferences;
 
+    Switch swAvailability;
     CardView cvUserInfo;
     TextView tvUserFullName, tvUserEmail, tvCurrProcess;
     RecyclerView recyclerView;
+    ScrollView scrollViewJobListing;
+    ImageView ivNotAvailable;
 
     public List<Job> recordList = new ArrayList<>();
     public Map<String, Job> ITEM_MAP =  new HashMap<String, Job>();
@@ -88,6 +93,7 @@ public class HomePageActivity extends AppCompatActivity {
     FusedLocationProviderClient mFusedLocationClient;
     private LocationRequest locationRequest;
     private LatLng userLoc;
+    String agentAvailability = "T";
 
     ProgressBar pbLoading;
 
@@ -123,6 +129,9 @@ public class HomePageActivity extends AppCompatActivity {
         tvCurrProcess = findViewById(R.id.tvHomePage_CurrProcess);
         pbLoading = findViewById(R.id.pbHomePage_Loading);
         recyclerView = findViewById(R.id.job_list);
+        swAvailability = findViewById(R.id.swAvailability);
+        scrollViewJobListing = findViewById(R.id.scrollViewJobListing);
+        ivNotAvailable  = findViewById(R.id.ivNotAvailable);
 
         //------------------------------------------------------
         // Initial object status
@@ -162,6 +171,20 @@ public class HomePageActivity extends AppCompatActivity {
         getUserDetails();
 
         //------------------------------------------------------------------
+        // Setup onClick listeners
+        //------------------------------------------------------------------
+        swAvailability.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if (swAvailability.isChecked()) agentAvailability = "T"; else agentAvailability = "F";
+
+                // Update agent availability
+                updateAgentAvailability(agentAvailability);
+                Log.i("Agent availability :", agentAvailability);
+            }
+        });
+        //------------------------------------------------------------------
         // Setup handler
         //------------------------------------------------------------------
         tvCurrProcess.setText("Initiating job search..");
@@ -172,10 +195,9 @@ public class HomePageActivity extends AppCompatActivity {
         pbLoading.setVisibility(View.INVISIBLE);
 
         getTransListing();
-
         hideSystemUI();
-
         startLocationUpdates();
+        resetBackground();
 
     }
 
@@ -663,6 +685,93 @@ public class HomePageActivity extends AppCompatActivity {
             requestQueue.add(jsonRequest);
     }
 
+    private void updateAgentAvailability(String isavailable) {
+
+        // API info
+        String url ="https://www.penawarcare.com/public/api.php";
+
+        // Data to be sent
+        final Map<String, String> dataparams = new HashMap<>();
+        dataparams.put("mode", "api_agent");
+        dataparams.put("select", "update_availability");
+        dataparams.put("agentid", agentid);
+        dataparams.put("securetokenid", securetokenid);
+        dataparams.put("isavailable", isavailable);
+
+        // On SUCCESS
+        Response.Listener<String> responseOK = new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+
+                Log.i("Response-2:",response);
+
+                try {
+                    JsonObject convertedObject = new Gson().fromJson(response, JsonObject.class);
+
+                    String returnValue = convertedObject.get("value").toString().replace("\"","");
+                    String message = convertedObject.get("msg").toString().replace("\"","");
+
+                    if (returnValue.equals("1")) {
+
+                        // If isavailable is T, show unavailable notice and darkens the listing area
+                        resetBackground();
+                        // If F, reactivate the listing
+
+                    } else {
+
+                        // Invalid. Show error
+                        Snackbar snackbar = Snackbar.make(findViewById(R.id.constraintLayoutHomePage), message, Snackbar.LENGTH_LONG);
+                        snackbar.setAction("Dismiss", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+
+                            }
+                        });
+                        snackbar.show();
+                    }
+
+                } catch (JsonSyntaxException ex) {
+                    // Error catched
+                }
+            }
+
+        };
+
+        // On FAIL
+        Response.ErrorListener responseError = new Response.ErrorListener() {
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                // TODO: Handle error
+            }
+        };
+
+        // Compile request data
+        StringRequest jsonRequest = new StringRequest (Request.Method.POST, url,responseOK,responseError){
+
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                return dataparams;
+            }
+        };
+
+        // Add the request to the RequestQueue.
+        requestQueue.add(jsonRequest);
+    }
+
+    public void resetBackground() {
+
+        if (agentAvailability.equals("F")) {
+            scrollViewJobListing.setVisibility(View.GONE);
+            ivNotAvailable.setVisibility(View.VISIBLE);
+            swAvailability.setText(swAvailability.getTextOff().toString());
+        } else {
+            scrollViewJobListing.setVisibility(View.VISIBLE);
+            ivNotAvailable.setVisibility(View.GONE);
+            swAvailability.setText(swAvailability.getTextOn().toString());
+        }
+
+    }
     public void sendNotification(String title, String desc){
 
         NotificationManager mNotificationManager;

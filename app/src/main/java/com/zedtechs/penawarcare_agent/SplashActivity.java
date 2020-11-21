@@ -318,4 +318,5 @@ public class SplashActivity extends AppCompatActivity {
         // Add the request to the RequestQueue.
         requestQueue.add(jsonRequest);
     }
+
 }
