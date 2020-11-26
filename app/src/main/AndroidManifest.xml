@@ -54,7 +54,12 @@
             android:name=".HomePageActivity"
             android:configChanges="orientation|keyboardHidden"
             android:label="PenawarCare Agent"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name=".HomePageActivity" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".VerifyPhoneActivity"
             android:configChanges="orientation|keyboardHidden"

@@ -95,6 +95,7 @@ public class HomePageActivity extends AppCompatActivity {
 
     public List<Job> jobList = new ArrayList<>();
     public Map<String, Job> ITEM_MAP =  new HashMap<String, Job>();
+    Boolean notificationPushed = false;
 
     String google_maps_key;
     FusedLocationProviderClient mFusedLocationClient;
@@ -639,6 +640,7 @@ public class HomePageActivity extends AppCompatActivity {
                     Log.i("Response-2:",response);
 
                     try {
+
                         JsonObject convertedObject = new Gson().fromJson(response, JsonObject.class);
 
                         String returnValue = convertedObject.get("value").toString().replace("\"","");
@@ -807,7 +809,7 @@ public class HomePageActivity extends AppCompatActivity {
         mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
         // === Removed some obsoletes
-        /*
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
         {
             String channelId = "Your_channel_id";
@@ -818,7 +820,7 @@ public class HomePageActivity extends AppCompatActivity {
             mNotificationManager.createNotificationChannel(channel);
             mBuilder.setChannelId(channelId);
         }
-*/
+
         // notificationID allows you to update the notification later on.
         mNotificationManager.notify(0, mBuilder.build());
     }
@@ -887,6 +889,12 @@ public class HomePageActivity extends AppCompatActivity {
 
                 if (returnValue.equals("1")) {
 
+                    // Push notification of job assignment
+                    if (!notificationPushed) {
+                        sendNotification("Job Offer", "You have been offered a job!");
+                        notificationPushed = true;
+                    }
+
                     // Put data into array
                     Gson gson = new GsonBuilder().serializeNulls().create();
                     Type jobListType = new TypeToken<ArrayList<Job>>(){}.getType();
@@ -919,6 +927,8 @@ public class HomePageActivity extends AppCompatActivity {
                     //billList.sort(Comparator.comparing(Clinic::getDistance));
 
                 } else {
+
+                    notificationPushed = false;
 
                     System.out.println("Job not found");
                     recyclerView.setAdapter(null);
