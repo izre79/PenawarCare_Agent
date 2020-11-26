@@ -15,11 +15,14 @@ public class Job {
     public String JOB_STATUS_CODE;
     public String JOB_STATUS_DESC;
 
-    public Job(JsonObject obj) {
+    public Job (JsonObject obj) {
+
+        System.out.println("Init job object : " + obj.get("JOB_ID").toString());
+
         this.JOB_ID = obj.get("JOB_ID").toString();
         this.REGISTRATION_ID = obj.get("REGISTRATION_ID").toString();
         this.AGENT_ID = obj.get("AGENT_ID").toString();
-        this.APPOINT_DATETIME = obj.get("APPOINT_DATETIME").toString();
+        if (obj.has("APPOINT_DATETIME")) this.APPOINT_DATETIME = obj.get("APPOINT_DATETIME").toString();
         this.OFFER_DATETIME = obj.get("OFFER_DATETIME").toString();
         this.CLINIC_CODE = obj.get("CLINIC_CODE").toString();
         this.CLINIC_NAME = obj.get("CLINIC_NAME").toString();
@@ -27,4 +30,9 @@ public class Job {
         this.JOB_STATUS_CODE = obj.get("JOB_STATUS_CODE").toString();
         this.JOB_STATUS_DESC = obj.get("JOB_STATUS_DESC").toString();
     }
+
+    public String getJobID(){
+        return "27";
+    }
+
 }

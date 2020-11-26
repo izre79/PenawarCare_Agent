@@ -671,7 +671,7 @@ public class JobInitActivity extends AppCompatActivity {
                     if (returnValue.equals("1")) {
 
                         // Show message
-                        Snackbar snackbar = Snackbar.make(findViewById(R.id.constraintLayoutJobInit), message, Snackbar.LENGTH_LONG);
+                        /*Snackbar snackbar = Snackbar.make(findViewById(R.id.constraintLayoutJobInit), message, Snackbar.LENGTH_LONG);
                         snackbar.setAction("Dismiss", new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
@@ -679,7 +679,7 @@ public class JobInitActivity extends AppCompatActivity {
                             }
                         });
                         snackbar.show();
-
+                        */
                         resetNavigation();
 
                     } else {
