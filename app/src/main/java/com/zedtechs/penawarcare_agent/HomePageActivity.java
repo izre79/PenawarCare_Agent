@@ -58,10 +58,17 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 import com.zedtechs.penawarcare_agent.classes.Job;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.lang.reflect.Type;
 import java.text.SimpleDateFormat;
@@ -86,7 +93,7 @@ public class HomePageActivity extends AppCompatActivity {
     ScrollView scrollViewJobListing;
     ImageView ivNotAvailable;
 
-    public List<Job> recordList = new ArrayList<>();
+    public List<Job> jobList = new ArrayList<>();
     public Map<String, Job> ITEM_MAP =  new HashMap<String, Job>();
 
     String google_maps_key;
@@ -405,10 +412,10 @@ public class HomePageActivity extends AppCompatActivity {
                         // Set the content to appear under the system bars so that the
                         // content doesn't resize when the system bars hide and show.
                         View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                        //| View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                         | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                         // Hide the nav bar and status bar
-                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                        //| View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
                         | View.SYSTEM_UI_FLAG_FULLSCREEN);
     }
 
@@ -765,10 +772,14 @@ public class HomePageActivity extends AppCompatActivity {
             scrollViewJobListing.setVisibility(View.GONE);
             ivNotAvailable.setVisibility(View.VISIBLE);
             swAvailability.setText(swAvailability.getTextOff().toString());
+
+            tvCurrProcess.setText("Currently off-duty");
         } else {
             scrollViewJobListing.setVisibility(View.VISIBLE);
             ivNotAvailable.setVisibility(View.GONE);
             swAvailability.setText(swAvailability.getTextOn().toString());
+
+            tvCurrProcess.setText("Ready for job assignment");
         }
 
     }
@@ -796,6 +807,7 @@ public class HomePageActivity extends AppCompatActivity {
         mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
         // === Removed some obsoletes
+        /*
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
         {
             String channelId = "Your_channel_id";
@@ -806,7 +818,7 @@ public class HomePageActivity extends AppCompatActivity {
             mNotificationManager.createNotificationChannel(channel);
             mBuilder.setChannelId(channelId);
         }
-
+*/
         // notificationID allows you to update the notification later on.
         mNotificationManager.notify(0, mBuilder.build());
     }
@@ -855,59 +867,71 @@ public class HomePageActivity extends AppCompatActivity {
         dataparams.put("securetokenid", securetokenid);
 
         // On SUCCESS
-        Response.Listener<String> responseOK = response -> {
+        Response.Listener<String> responseOK = new Response.Listener<String>() {
 
-            Log.i("Response:",response);
+            @Override
+            public void onResponse(String response){
 
-            JsonObject convertedObject = new Gson().fromJson(response, JsonObject.class);
+                Log.i("Response:", response);
 
-            String returnValue = convertedObject.get("value").toString();
-            String message = convertedObject.get("msg").toString();
-            String data = convertedObject.get("listdata").toString();
-            String sql = convertedObject.get("sql").toString();
+                JsonObject convertedObject = new Gson().fromJson(response, JsonObject.class);
 
-            System.out.println("SQL:"+sql);
+                String returnValue = convertedObject.get("value").toString();
+                String message = convertedObject.get("msg").toString();
+                String data = convertedObject.get("listdata").toString();
+                String sql = convertedObject.get("sql").toString();
 
-            if (returnValue.equals("1")){
+                Log.i("Info:", "Value:" + returnValue + " Data:" + data);
 
-                // Put data into array
-                Type recordListType = new TypeToken<ArrayList<Job>>(){}.getType();
-                recordList = new Gson().fromJson(data, recordListType);
+                System.out.println("SQL:" + sql);
 
-                if (!recordList.isEmpty()) {
-                    System.out.println("List is not empty");
+                if (returnValue.equals("1")) {
 
-                    for (int i = 0; i < recordList.size(); i++) {
-                        System.out.println(recordList.get(i).JOB_ID);
-                        ITEM_MAP.put(recordList.get(i).JOB_ID,recordList.get(i));
+                    // Put data into array
+                    Gson gson = new GsonBuilder().serializeNulls().create();
+                    Type jobListType = new TypeToken<ArrayList<Job>>(){}.getType();
+                    jobList = gson.fromJson(data, jobListType);
+
+                    if (!jobList.isEmpty()) {
+                        System.out.println("List is not empty. Size = " + jobList.size());
+                        System.out.println("JOB ID [0] = " + jobList.get(0).JOB_ID);
+
+                        Job currJob;
+
+                        for (int i = 0; i < jobList.size(); i++) {
+                            currJob = jobList.get(i);
+                            System.out.println("JOB ID[" + i + "]-->" + currJob.getJobID() + "|Agent_ID=" + currJob.AGENT_ID);
+                            ITEM_MAP.put(currJob.JOB_ID, currJob);
+                        }
+
+                    } else {
+                        System.out.println("List is empty?");
+                        Snackbar snackbar = Snackbar.make(findViewById(R.id.constraintLayoutHomePage), message, Snackbar.LENGTH_LONG);
+                        snackbar.setAction("Dismiss", v -> {
+                        });
+                        snackbar.show();
                     }
 
+                    assert recyclerView != null;
+                    setupRecyclerView((RecyclerView) recyclerView);
+
+                    // Sort by distance
+                    //billList.sort(Comparator.comparing(Clinic::getDistance));
+
                 } else {
-                    System.out.println("List is empty?");
-                    Snackbar snackbar = Snackbar.make(findViewById(R.id.constraintLayoutHomePage), message, Snackbar.LENGTH_LONG);
-                    snackbar.setAction("Dismiss", v -> {});
-                    snackbar.show();
-                }
 
-
-                assert recyclerView != null;
-                setupRecyclerView((RecyclerView) recyclerView);
-
-                // Sort by distance
-                //billList.sort(Comparator.comparing(Clinic::getDistance));
-
-            } else {
-
-                System.out.println("Job not found");
-                recyclerView.setAdapter(null);
-                // Invalid. Show error
+                    System.out.println("Job not found");
+                    recyclerView.setAdapter(null);
+                    // Invalid. Show error
                 /*Snackbar snackbar = Snackbar.make(findViewById(R.id.constraintLayoutHomePage), message, Snackbar.LENGTH_LONG);
                 snackbar.setAction("Dismiss", v -> {});
                 snackbar.show();
                 */
-            }
+                }
 
-            pbLoading.setVisibility(View.INVISIBLE);
+                pbLoading.setVisibility(View.INVISIBLE);
+
+            }
         };
 
         // On FAIL
@@ -931,7 +955,7 @@ public class HomePageActivity extends AppCompatActivity {
     }
 
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
-        recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(this, recordList));
+        recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(this, jobList));
     }
 
     public static class SimpleItemRecyclerViewAdapter
