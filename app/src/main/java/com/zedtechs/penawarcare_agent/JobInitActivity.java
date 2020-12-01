@@ -249,11 +249,7 @@ public class JobInitActivity extends AppCompatActivity {
                                 getDistance(userLoc, custLoc);
                             }
 
-                            if (valueDistance < minimumRangeToArrive) {
-                                arrivedAtDestination = true;
-                            } else {
-                                arrivedAtDestination = false;
-                            }
+                            arrivedAtDestination = valueDistance < minimumRangeToArrive;
                         }
 
 

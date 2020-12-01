@@ -14,7 +14,9 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -29,6 +31,9 @@ import com.android.volley.toolbox.BasicNetwork;
 import com.android.volley.toolbox.DiskBasedCache;
 import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.StringRequest;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
@@ -41,7 +46,7 @@ public class SplashActivity extends AppCompatActivity {
 
     private TextView tvMessage;
     private ImageView logo;
-    private static int splashTimeOut=2000;
+    private static final int splashTimeOut=2000;
     private Handler h;
     private Runnable r;
 
@@ -86,6 +91,25 @@ public class SplashActivity extends AppCompatActivity {
             }
         },splashTimeOut);
 
+        Log.w("Splash", "Fetching FCM registration now...");
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(new OnCompleteListener<String>() {
+                    @Override
+                    public void onComplete(@NonNull Task<String> task) {
+                        if (!task.isSuccessful()) {
+                            Log.w("Splash", "Fetching FCM registration token failed", task.getException());
+                            Toast.makeText(SplashActivity.this, "Fetching FCM registration token failed", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
+                        // Get new FCM registration token
+                        String token = task.getResult();
+
+                        // Log and toast
+                        Log.d("Splash", token);
+                        Toast.makeText(SplashActivity.this, "Fetching FCM registration token success", Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
     public void onWindowFocusChanged(boolean hasFocus) {

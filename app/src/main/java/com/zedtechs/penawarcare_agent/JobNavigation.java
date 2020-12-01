@@ -118,7 +118,7 @@ public class JobNavigation extends AppCompatActivity
     int focusClinicID;
 
 
-    private int REQUEST_CLINIC_DETAILS = 1000;
+    private final int REQUEST_CLINIC_DETAILS = 1000;
     private static final int LOCATION_PERMISSION_CODE = 100;
 
     @Override
@@ -287,7 +287,7 @@ public class JobNavigation extends AppCompatActivity
         tvCurrentProcess.setText("Initiating Google Map");
 
         mMap = googleMap;
-        mMap.setMapType(mMap.MAP_TYPE_NORMAL);
+        mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         mMap.setOnCameraMoveStartedListener(this);
 
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
@@ -392,17 +392,10 @@ public class JobNavigation extends AppCompatActivity
                         tvDistance.setText(parsedDistance);
                         //tvCurrentProcess.setText("Distance to Destination : "+Math.round(valueDistance) + " m");
 
-                        if (valueDistance < minimumRangeToArrive) {
-
-                            // Toast.makeText(getApplicationContext(), "You have arrived!", Toast.LENGTH_LONG).show();
-                            // Show the confirm arrival button
-
-                            arrivedAtDestination = true;
-
-                            // Once verified, app will update destination location to customer's location
-                        } else {
-                            arrivedAtDestination = false;
-                        }
+                        // Toast.makeText(getApplicationContext(), "You have arrived!", Toast.LENGTH_LONG).show();
+                        // Show the confirm arrival button
+                        // Once verified, app will update destination location to customer's location
+                        arrivedAtDestination = valueDistance < minimumRangeToArrive;
                     }
 
                     if (followMeFlag) {
@@ -589,9 +582,9 @@ public class JobNavigation extends AppCompatActivity
 
             return isOnPolyline;
 
-    };
+    }
 
-    @Override
+        @Override
     public void onCameraMoveStarted(int reason) {
 
         //followMeFlag = false;
@@ -638,7 +631,7 @@ public class JobNavigation extends AppCompatActivity
 
     @Override
     public void onRequestPermissionsResult(int requestCode,
-                                           String permissions[], int[] grantResults) {
+                                           String[] permissions, int[] grantResults) {
         switch (requestCode) {
             case MY_PERMISSIONS_REQUEST_LOCATION: {
                 // If request is cancelled, the result arrays are empty.

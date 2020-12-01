@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.AnimationDrawable;
 import android.location.Location;
@@ -83,12 +84,12 @@ public class HomePageActivity extends AppCompatActivity {
 
     RequestQueue requestQueue;
 
-    String agentid, mobileno, securetokenid, lastscrupdate = "";
+    String agentid, mobileno, securetokenid, lastscrupdate = "", fcmtoken;
     SharedPreferences sharedpreferences;
 
     Switch swAvailability;
     CardView cvUserInfo;
-    TextView tvUserFullName, tvUserEmail, tvCurrProcess;
+    TextView tvUserFullName, tvUserEmail, tvCurrProcess, tvVersion;
     RecyclerView recyclerView;
     ScrollView scrollViewJobListing;
     ImageView ivNotAvailable;
@@ -104,7 +105,6 @@ public class HomePageActivity extends AppCompatActivity {
     String agentAvailability = "T";
 
     ProgressBar pbLoading;
-
     Handler mHandler;
 
     static public String consultRegID = "", consultQueueNo = "";
@@ -127,11 +127,13 @@ public class HomePageActivity extends AppCompatActivity {
         agentid = sharedpreferences.getString("AGENTID","");
         mobileno = sharedpreferences.getString("MOBILE","");
         securetokenid = sharedpreferences.getString("SECURE_TOKEN_ID","");
+        fcmtoken = sharedpreferences.getString("FCM_TOKEN_ID","");
 
         //------------------------------------------------------
         // Linking resources to variables
         //------------------------------------------------------
         cvUserInfo = findViewById(R.id.cvPatientInfo);
+        tvVersion = findViewById(R.id.tvVersion);
         tvUserFullName = findViewById(R.id.tvUserFullName);
         tvUserEmail = findViewById(R.id.tvUserEmail);
         tvCurrProcess = findViewById(R.id.tvHomePage_CurrProcess);
@@ -173,10 +175,22 @@ public class HomePageActivity extends AppCompatActivity {
         requestQueue = new RequestQueue(cache, network); // Instantiate the RequestQueue with the cache and network.
         requestQueue.start(); // Start the queue
 
+        Log.i("FCM Token :", "---"+fcmtoken);
+
+        //------------------------------------------------------------------
+        // Update the fcmtoken if it is not empty
+        //------------------------------------------------------------------
+        if (!fcmtoken.isEmpty()) updateFCMToken();
+
         //------------------------------------------------------------------
         // Get data from database
         //------------------------------------------------------------------
         getUserDetails();
+
+        //------------------------------------------------------------------
+        // Set as available everytime logged in
+        //------------------------------------------------------------------
+        updateAgentAvailability(agentAvailability);
 
         //------------------------------------------------------------------
         // Setup onClick listeners
@@ -196,6 +210,19 @@ public class HomePageActivity extends AppCompatActivity {
         // Setup handler
         //------------------------------------------------------------------
         tvCurrProcess.setText("Initiating job search..");
+
+        try {
+            PackageInfo pInfo = getApplicationContext().getPackageManager().getPackageInfo(getApplicationContext().getPackageName(), 0);
+            String versionName = pInfo.versionName;
+            int versionCode = pInfo.versionCode;
+
+            tvVersion.setText(versionName);
+
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+
+
 
         mHandler = new Handler();
         mHandler.postDelayed(m_Runnable,5000);
@@ -364,7 +391,7 @@ public class HomePageActivity extends AppCompatActivity {
     }
 
     public void onRequestPermissionsResult(int requestCode,
-                                           String permissions[], int[] grantResults) {
+                                           String[] permissions, int[] grantResults) {
         switch (requestCode) {
             case MY_PERMISSIONS_REQUEST_LOCATION: {
                 // If request is cancelled, the result arrays are empty.
@@ -479,6 +506,68 @@ public class HomePageActivity extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void updateFCMToken() {
+        // API info
+        String url ="https://www.penawarcare.com/public/api.php";
+
+        // Data to be sent
+        final Map<String, String> dataparams = new HashMap<>();
+        dataparams.put("mode", "api_agent");
+        dataparams.put("select", "update_fcm_token");
+        dataparams.put("agentid", agentid);
+        dataparams.put("fcmtoken", fcmtoken);
+        dataparams.put("securetokenid", securetokenid);
+
+        // On SUCCESS
+        Response.Listener<String> responseOK = new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+
+                Log.i("FCMTokenUpdate:",response);
+
+                try {
+                    JsonObject convertedObject = new Gson().fromJson(response, JsonObject.class);
+                    String returnValue = convertedObject.get("value").toString().replace("\"","");
+                    String message = convertedObject.get("msg").toString().replace("\"","");
+
+                    if (returnValue.equals("1")) {
+
+                        // Do nothing
+
+                    } else {
+
+                        // Also do nothing
+                    }
+
+                } catch (JsonSyntaxException ex) {
+                    // Error catched
+                }
+            }
+
+        };
+
+        // On FAIL
+        Response.ErrorListener responseError = new Response.ErrorListener() {
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                // TODO: Handle error
+            }
+        };
+
+        // Compile request data
+        StringRequest jsonRequest = new StringRequest (Request.Method.POST, url,responseOK,responseError){
+
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                return dataparams;
+            }
+        };
+
+        // Add the request to the RequestQueue.
+        requestQueue.add(jsonRequest);
     }
 
     private void updateAgentLocation() {
@@ -835,6 +924,8 @@ public class HomePageActivity extends AppCompatActivity {
                 {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+
+                        updateAgentAvailability("F");
                         HomePageActivity.super.finishAffinity();
                         //finish();
                     }
@@ -850,7 +941,6 @@ public class HomePageActivity extends AppCompatActivity {
         System.out.println("Retrieving job listing...");
 
         // Setup request queue
-        RequestQueue requestQueue;
         Cache cache = new DiskBasedCache(getCacheDir(), 1024 * 1024); // Instantiate the cache - 1MB cap
         Network network = new BasicNetwork(new HurlStack()); // Set up the network to use HttpURLConnection as the HTTP client.
         requestQueue = new RequestQueue(cache, network); // Instantiate the RequestQueue with the cache and network.
@@ -891,7 +981,7 @@ public class HomePageActivity extends AppCompatActivity {
 
                     // Push notification of job assignment
                     if (!notificationPushed) {
-                        sendNotification("Job Offer", "You have been offered a job!");
+                        //sendNotification("Job Offer", "You have been offered a job!");
                         notificationPushed = true;
                     }
 
@@ -921,7 +1011,7 @@ public class HomePageActivity extends AppCompatActivity {
                     }
 
                     assert recyclerView != null;
-                    setupRecyclerView((RecyclerView) recyclerView);
+                    setupRecyclerView(recyclerView);
 
                     // Sort by distance
                     //billList.sort(Comparator.comparing(Clinic::getDistance));

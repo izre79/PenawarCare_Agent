@@ -1,7 +1,8 @@
 package com.zedtechs.penawarcare_agent.classes;
 
 public class MainMenuItem {
-    private String _title, _desc;
+    private final String _title;
+    private final String _desc;
     private boolean mOnline;
 
     public MainMenuItem(String title, String desc) {

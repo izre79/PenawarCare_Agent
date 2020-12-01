@@ -57,7 +57,7 @@ public class ClinicDetails extends AppCompatActivity {
 
     List<ClinicOpenHours> openDayList = new ArrayList<>();
 
-    private int REQUEST_REGISTER_CONSULT = 1000;
+    private final int REQUEST_REGISTER_CONSULT = 1000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
