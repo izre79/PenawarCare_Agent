@@ -940,12 +940,6 @@ public class HomePageActivity extends AppCompatActivity {
 
         System.out.println("Retrieving job listing...");
 
-        // Setup request queue
-        Cache cache = new DiskBasedCache(getCacheDir(), 1024 * 1024); // Instantiate the cache - 1MB cap
-        Network network = new BasicNetwork(new HurlStack()); // Set up the network to use HttpURLConnection as the HTTP client.
-        requestQueue = new RequestQueue(cache, network); // Instantiate the RequestQueue with the cache and network.
-        requestQueue.start(); // Start the queue
-
         // API info
         String url ="https://www.penawarcare.com/public/api.php";
 
